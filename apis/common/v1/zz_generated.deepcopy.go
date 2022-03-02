@@ -224,6 +224,11 @@ func (in *ResourceSpec) DeepCopyInto(out *ResourceSpec) {
 		*out = new(Reference)
 		**out = **in
 	}
+	if in.ProviderConfigSelector != nil {
+		in, out := &in.ProviderConfigSelector, &out.ProviderConfigSelector
+		*out = new(Selector)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.ProviderReference != nil {
 		in, out := &in.ProviderReference, &out.ProviderReference
 		*out = new(Reference)

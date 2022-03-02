@@ -72,13 +72,22 @@ func (m *ProviderReferencer) SetProviderReference(p *xpv1.Reference) { m.Ref = p
 func (m *ProviderReferencer) GetProviderReference() *xpv1.Reference { return m.Ref }
 
 // ProviderConfigReferencer is a mock that implements ProviderConfigReferencer interface.
-type ProviderConfigReferencer struct{ Ref *xpv1.Reference }
+type ProviderConfigReferencer struct {
+	Ref      *xpv1.Reference
+	Selector *xpv1.Selector
+}
 
 // SetProviderConfigReference sets the ProviderConfigReference.
 func (m *ProviderConfigReferencer) SetProviderConfigReference(p *xpv1.Reference) { m.Ref = p }
 
 // GetProviderConfigReference gets the ProviderConfigReference.
 func (m *ProviderConfigReferencer) GetProviderConfigReference() *xpv1.Reference { return m.Ref }
+
+// SetProviderConfigSelector sets the ProviderConfigSelector.
+func (m *ProviderConfigReferencer) SetProviderConfigSelector(s *xpv1.Selector) { m.Selector = s }
+
+// GetProviderConfigSelector gets the ProviderConfigSelector.
+func (m *ProviderConfigReferencer) GetProviderConfigSelector() *xpv1.Selector { return m.Selector }
 
 // RequiredProviderConfigReferencer is a mock that implements the
 // RequiredProviderConfigReferencer interface.

@@ -40,6 +40,9 @@ const (
 	errNoHandlerForSourceFmt = "no extraction handler registered for source: %s"
 	errMissingPCRef          = "managed resource does not reference a ProviderConfig"
 	errApplyPCU              = "cannot apply ProviderConfigUsage"
+	errGetProviderConfig     = "cannot get provider config"
+	errListProviderConfigs   = "cannot list provider configs"
+	errNoProviderConfig      = "no provider config found"
 )
 
 type errMissingRef struct{ error }
@@ -99,6 +102,33 @@ func CommonCredentialExtractor(ctx context.Context, source xpv1.CredentialsSourc
 		return nil, nil
 	}
 	return nil, errors.Errorf(errNoHandlerForSourceFmt, source)
+}
+
+// ExtractProviderConfig extracts a provider config from the given reference or selector if reference is nil.
+// MatchControllerRef is ignored for selectors.
+// If a config is extracted via selectors it will also call SetProviderConfigReference with the name of the extracted object.
+// An error is returned in case no config could be extracted.
+func ExtractProviderConfig(ctx context.Context, c client.Reader, mg Managed, config ProviderConfig, configList ProviderConfigList) (ProviderConfig, error) {
+	if mg.GetProviderConfigReference() != nil {
+		err := c.Get(ctx, types.NamespacedName{Name: mg.GetProviderConfigReference().Name}, config)
+		return config, errors.Wrap(err, errGetProviderConfig)
+	}
+
+	if mg.GetProviderConfigSelector() != nil {
+		err := c.List(ctx, configList, client.MatchingLabels(mg.GetProviderConfigSelector().MatchLabels))
+		if err != nil {
+			return config, errors.Wrap(err, errListProviderConfigs)
+		}
+
+		for _, c := range configList.GetItems() {
+			mg.SetProviderConfigReference(&xpv1.Reference{
+				Name: c.GetName(),
+			})
+			return c, nil
+		}
+	}
+
+	return config, errors.New(errNoProviderConfig)
 }
 
 // A Tracker tracks managed resources.

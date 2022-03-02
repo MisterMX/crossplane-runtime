@@ -76,6 +76,9 @@ type ProviderReferencer interface {
 type ProviderConfigReferencer interface {
 	GetProviderConfigReference() *xpv1.Reference
 	SetProviderConfigReference(p *xpv1.Reference)
+
+	GetProviderConfigSelector() *xpv1.Selector
+	SetProviderConfigSelector(s *xpv1.Selector)
 }
 
 // A RequiredProviderConfigReferencer may reference a provider config resource.
@@ -181,6 +184,13 @@ type ProviderConfig interface {
 
 	UserCounter
 	Conditioned
+}
+
+// A ProviderConfigList is a list of provider configs.
+type ProviderConfigList interface {
+	client.ObjectList
+
+	GetItems() []ProviderConfig
 }
 
 // A ProviderConfigUsage indicates a usage of a Crossplane provider config.
